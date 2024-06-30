@@ -1,7 +1,5 @@
 import tkinter as tk
 import customtkinter as ctk
-import sqlite3
-
 
 # gui settings
 ctk.set_appearance_mode("dark")
@@ -29,6 +27,9 @@ players_btn = ctk.CTkButton(frame, text="Players")
 players_btn.pack()
 coaches_btn = ctk.CTkButton(frame, text="Coaches")
 coaches_btn.pack()
+# all / whole db - btn widget
+viewAll_btn = ctk.CTkButton(frame, text="View All")
+viewAll_btn.pack()
 
 # run
 frame.mainloop()
