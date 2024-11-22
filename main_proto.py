@@ -1,7 +1,9 @@
-import tkinter as tk
+from tkinter import *
 import customtkinter as ctk
-import proto.test_frame as tf
 import rec_db   
+import formatting
+
+
 
 # gui settings
 ctk.set_appearance_mode("dark")
@@ -11,21 +13,24 @@ ctk.set_default_color_theme("blue")
 frame = ctk.CTk()
 frame.title("SFUMC REC Soccer")
 title = ctk.CTkLabel(frame, text="REC Database")
-title.pack() 
-
+title.pack()
 # textbox display
 display = ctk.CTkTextbox(frame, width=600, height=300, font=("Helvetica", 16))
 display.pack()
 
+
+
 # player display
-def dis(cmd=None, s=None):
+def dis(cmd=None, dset=None):
     if cmd == "select-players":
-         players = rec_db.query_player(set(s))
+        players = rec_db.query_player(set(dset))
     else:
         players = rec_db.query_all_players()
-
-    for player in players:
-            display.insert(ctk.END, f"#{player[0]}    {player[1]}, {player[2].upper()}:    {player[3]} - {player[4]}\n\n")
+    
+    # format and display
+    labels = formatting.format_labels(players)
+    for label in labels:
+        display.insert(ctk.END, label)
 
 
 
@@ -49,9 +54,8 @@ def search(event=None):
     display.delete('1.0', ctk.END) 
     # first query names containing chars
     chars = search_bar.get().strip()
-    print(chars)
     if chars:
-        dis(cmd="select-players", s=chars)
+        dis(cmd="select-players", dsets=chars)
     else:
         # redisplay original
         dis()
@@ -60,6 +64,44 @@ ctk.CTkLabel(frame, text="Search").pack()
 search_bar = ctk.CTkEntry(frame)
 search_bar.pack()
 search_bar.bind("<KeyRelease>", search)
+
+
+
+# new player
+def new_player():
+    num = playerNumberEntry.get().strip()
+    playerNumberEntry.delete(0, ctk.END)
+
+    first = firstNameEntry.get().strip()
+    firstNameEntry.delete(0, ctk.END)
+
+    last = lastNameEntry.get().strip()
+    lastNameEntry.delete(0, ctk.END)
+
+    div = divisionEntry.get().strip()
+    divisionEntry.delete(0, ctk.END)
+
+    coach = coachEntry.get().strip()
+    coachEntry.delete(0, ctk.END)
+
+    rec_db.insert_player(num, first, last, div, coach)
+    dis(cmd="select-players", dset=first)
+
+# data fields
+playerNumberEntry = ctk.CTkEntry(frame, placeholder_text="Player Number #")
+playerNumberEntry.pack()
+firstNameEntry = ctk.CTkEntry(frame, placeholder_text="First Name")
+firstNameEntry.pack()
+lastNameEntry = ctk.CTkEntry(frame, placeholder_text="Last Name")
+lastNameEntry.pack()
+divisionEntry = ctk.CTkEntry(frame, placeholder_text="Division")
+divisionEntry.pack()
+coachEntry = ctk.CTkEntry(frame, placeholder_text="Coach")
+coachEntry.pack()
+
+newPlayer_btn = ctk.CTkButton(frame, text="Add Player", command=new_player)
+newPlayer_btn.pack()
+newPlayer_btn.bind("<Return>", new_player)
 
 
 
