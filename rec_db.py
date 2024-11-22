@@ -18,12 +18,22 @@ def insert_player(num, fn, ln, div, coach):
     conn.commit() 
 # query all players
 def query_all_players():
-    cursor.execute("SELECT * FROM players")
+    cursor.execute("SELECT * FROM players ORDER BY first_name")
     return cursor.fetchall() 
 # query player
-def query_player(fn, ln):
-    cursor.execute("SELECT * FROM players WHERE first_name = ? AND last_name = ?", (fn, ln))
-    return cursor.fetchall() 
+def query_player(chars):
+        query_conditions = []
+        params = []
+        
+        for char in chars:
+            query_conditions.append("first_name LIKE ?")
+            params.append(f"%{char}%")
+        
+        # combine conditions with AND
+        query = f"SELECT * FROM players WHERE {' AND '.join(query_conditions)} ORDER BY first_name"
+        
+        cursor.execute(query, params)
+        return cursor.fetchall()
 
 
 
