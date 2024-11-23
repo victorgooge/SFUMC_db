@@ -34,8 +34,13 @@ def query_player(chars):
         
         cursor.execute(query, params)
         return cursor.fetchall()
-def delete_player(lst):
-    pass
+# deleting player(s)
+def delete_player(to_delete):
+        name_tuples = [(name[0], name[1]) for name in to_delete]
+        placeholders = ",".join(["(?, ?)"] * len(name_tuples))
+        query = f"DELETE FROM players WHERE (first_name, last_name) IN ({placeholders})"
+        cursor.execute(query, [item for sublist in name_tuples for item in sublist])
+        conn.commit()
      
 
 

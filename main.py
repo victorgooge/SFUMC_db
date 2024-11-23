@@ -140,10 +140,19 @@ def show_add_player_frame():
 add_button = ctk.CTkButton(button_frame, text="Add Item", corner_radius=8, command=show_add_player_frame)
 add_button.pack(side="left", padx=10)
 
+# delete player(s) from db and remove from tree
+def delete():
+    selected_items = tree.selection()
+    to_delete = []
+    for item in selected_items:
+        values = tree.item(item, "values")
+        to_delete.append((values[1], values[2]))  # db data: 1 - first_name, 2 - last_name
+    if to_delete:
+        rec_db.delete_player(to_delete)
+        display()
 # delete Button
-delete_button = ctk.CTkButton(button_frame, text="Delete Item", corner_radius=8, command=lambda: print("Delete Item"))
+delete_button = ctk.CTkButton(button_frame, text="Delete Item", corner_radius=8, command=delete)
 delete_button.pack(side="left", padx=10)
-
 
 # widget functionality
 # search bar
@@ -158,6 +167,8 @@ search_entry = ctk.CTkEntry(button_frame, placeholder_text="Search")
 search_entry.pack(side="left", fill="x", expand=True, padx=10)
 search_entry.bind("<KeyRelease>", search)
 
+
+
 # display data from db into tree table
 def display(cmd=None, dset=None):
     for item in tree.get_children():
@@ -168,6 +179,8 @@ def display(cmd=None, dset=None):
         data = rec_db.query_all_players()
     for row in data:
         tree.insert("", "end", values=row)
+
+
 
 # exe
 display()
