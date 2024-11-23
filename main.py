@@ -2,22 +2,26 @@ import customtkinter as ctk
 from tkinter import ttk
 import rec_db  
 
+
+
 # initialize CustomTkinter
 ctk.set_appearance_mode("Dark")  
 ctk.set_default_color_theme("blue")  
-
 # create main root window
 root = ctk.CTk()
 root.title("Modern CTk Table")
 root.geometry("700x400")
 
+
+
 # main Frame (contains all subframes)
 main_frame = ctk.CTkFrame(root, fg_color="#2e2e2e")
 main_frame.pack(fill="both", expand=True, padx=20, pady=20)
-
 # table Frame (for TreeView)
 table_frame = ctk.CTkFrame(main_frame, fg_color="#2e2e2e")
 table_frame.pack(fill="both", expand=True, pady=(10, 0))
+
+
 
 # TreeView (Table)
 tree = ttk.Treeview(
@@ -58,6 +62,8 @@ tree.pack(fill="both", expand=True)
 # button frame (for actions and search)
 button_frame = ctk.CTkFrame(main_frame, fg_color="#2e2e2e")
 button_frame.pack(fill="x", pady=10)
+
+
 
 # frame when adding player data 
 def show_add_player_frame():
@@ -129,6 +135,8 @@ def show_add_player_frame():
     add_frame.pack(fill="both", expand=True)
 
 
+
+# widgets in button frame
 add_button = ctk.CTkButton(button_frame, text="Add Item", corner_radius=8, command=show_add_player_frame)
 add_button.pack(side="left", padx=10)
 
@@ -136,6 +144,8 @@ add_button.pack(side="left", padx=10)
 delete_button = ctk.CTkButton(button_frame, text="Delete Item", corner_radius=8, command=lambda: print("Delete Item"))
 delete_button.pack(side="left", padx=10)
 
+
+# widget functionality
 # search bar
 def search(event=None):
     query = search_entry.get().strip()
