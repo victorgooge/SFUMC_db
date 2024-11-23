@@ -82,37 +82,49 @@ def show_add_player_frame():
 
     # dropdown for divisions
     division_options = ["U6", "U8", "U12", "U16"]  # divisions
-    division = ctk.CTkOptionMenu(add_frame, values=division_options)
+    division = ctk.CTkOptionMenu(
+        add_frame, 
+        values=division_options,
+        fg_color="#666562",
+        button_color="#403f3e",
+        button_hover_color="#adadac",
+        dropdown_fg_color="#666562",
+        dropdown_hover_color="#adadac"
+    )
     division.set("Select Division")  
     division.pack(pady=5)
 
     # dropdown for coaches
     coach_options = ["Carlos", "Aria", "Lionel", "William"]  # coaches
-    coach = ctk.CTkOptionMenu(add_frame, values=coach_options)
+    coach = ctk.CTkOptionMenu(
+        add_frame, 
+        values=coach_options,
+                fg_color="#666562",
+        button_color="#403f3e",
+        button_hover_color="#adadac",
+        dropdown_fg_color="#666562",
+        dropdown_hover_color="#adadac"
+    )
     coach.set("Select Coach")  
     coach.pack(pady=5)
 
     # submit data to db and tree
-    def submit():
+    def submit(event=None):
         # add player to database and table
         rec_db.insert_player(
             player_number.get().strip(),
             first_name.get().strip(),
             last_name.get().strip(),
-            division.get().strip(),  # Get selected division
-            coach.get().strip(),     # Get selected coach
+            division.get(), 
+            coach.get(),    
         )
         tree.insert("", "end", values=(
             player_number.get().strip(),
             first_name.get().strip(),
             last_name.get().strip(),
-            division.get().strip(),
-            coach.get().strip(),
+            division.get(),
+            coach.get(),
         ))
-        # clear inputs in entry fields
-        player_number.delete(0, "end")
-        first_name.delete(0, "end")
-        last_name.delete(0, "end")
         division.set("Select Division")
         coach.set("Select Coach")
 
@@ -120,7 +132,10 @@ def show_add_player_frame():
         add_frame.pack_forget()
         main_frame.pack(fill="both", expand=True)
 
-    ctk.CTkButton(add_frame, text="Submit", command=submit).pack(pady=10)
+    submit_btn = ctk.CTkButton(add_frame, text="Submit", command=submit)
+    submit_btn.pack(pady=10)
+
+    root.bind("<Return>", submit)
 
     # back 
     def back():
@@ -136,12 +151,13 @@ def show_add_player_frame():
 
 
 
+
 # widgets in button frame
 add_button = ctk.CTkButton(button_frame, text="Add Item", corner_radius=8, command=show_add_player_frame)
 add_button.pack(side="left", padx=10)
 
 # delete player(s) from db and remove from tree
-def delete():
+def delete(event=None):
     selected_items = tree.selection()
     to_delete = []
     for item in selected_items:
@@ -153,6 +169,7 @@ def delete():
 # delete Button
 delete_button = ctk.CTkButton(button_frame, text="Delete Item", corner_radius=8, command=delete)
 delete_button.pack(side="left", padx=10)
+tree.bind("<BackSpace>", delete)
 
 # widget functionality
 # search bar
