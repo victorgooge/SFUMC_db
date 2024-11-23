@@ -34,6 +34,9 @@ def query_player(chars):
         
         cursor.execute(query, params)
         return cursor.fetchall()
+def delete_player(lst):
+    pass
+     
 
 
 
