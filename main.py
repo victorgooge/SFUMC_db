@@ -131,6 +131,7 @@ def show_add_player_frame():
         # switch back to main frame
         add_frame.pack_forget()
         main_frame.pack(fill="both", expand=True)
+        display()
 
     submit_btn = ctk.CTkButton(add_frame, text="Submit", command=submit)
     submit_btn.pack(pady=10)
