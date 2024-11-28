@@ -143,7 +143,7 @@ def show_add_player_frame(event=None):
         player_number_val = player_number.get().strip()
         first_name_val = first_name.get().strip()
         last_name_val = last_name.get().strip()
-        division_val = division.get()
+        division_val = division.get().split('U')[1] # division integer U - #
         coach_val = coach.get()
 
         rec_db.insert_player(
@@ -250,6 +250,7 @@ search_entry.pack(side="left", fill="x", expand=True, padx=10)
 search_entry.bind("<KeyRelease>", search)
 
 
+
 # display data from db into tree table
 def display(cmd=None, sort=None, dset=None):
     for item in tree.get_children():
@@ -271,6 +272,7 @@ def display(cmd=None, sort=None, dset=None):
 
     for row in data:
         tree.insert("", "end", values=row)
+        # TODO: fix DB data field, division, and tree table formatting
 
 
 # exe
