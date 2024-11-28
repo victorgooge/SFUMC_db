@@ -102,7 +102,7 @@ def show_add_player_frame(event=None):
     coach = ctk.CTkOptionMenu(
         add_frame, 
         values=coach_options,
-                fg_color="#666562",
+        fg_color="#666562",
         button_color="#403f3e",
         button_hover_color="#adadac",
         dropdown_fg_color="#666562",
@@ -196,6 +196,16 @@ delete_button = ctk.CTkButton(button_frame, text="Delete Item", corner_radius=8,
 delete_button.pack(side="left", padx=10)
 tree.bind("<BackSpace>", delete)
 
+# sort
+sort_options = ["Name [A-Z]", "Name [Z-A]", "Number", "Division", "Coach"]  
+sort_menu = ctk.CTkOptionMenu(
+    button_frame, 
+    values=sort_options,
+    command=lambda option: display(cmd="sort", sort=option)  
+)
+sort_menu.set("Sort By")  
+sort_menu.pack(side="left", padx=10)
+
 # widget functionality
 # search bar
 def search(event=None):
@@ -212,13 +222,17 @@ search_entry.bind("<KeyRelease>", search)
 
 
 # display data from db into tree table
-def display(cmd=None, dset=None):
+def display(cmd=None, sort=None, dset=None):
     for item in tree.get_children():
         tree.delete(item)
-    if cmd == "select-players":
+
+    if cmd == "select-players" and dset: # player search
         data = rec_db.query_player(dset)
+    elif cmd == "sort" and sort: # filtered sort
+        data = rec_db.query_all_players(sort)
     else:
-        data = rec_db.query_all_players()
+        data = rec_db.query_all_players("Name [A-Z]") # default alphabetical sort
+        
     for row in data:
         tree.insert("", "end", values=row)
 
