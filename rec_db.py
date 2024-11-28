@@ -1,5 +1,6 @@
 import sqlite3
 import pandas as pd
+from tkinter import filedialog
 
 # db
 conn = sqlite3.connect('sfumc_rec.db')
@@ -9,22 +10,51 @@ cursor = conn.cursor()
 
 # players table
 c1 = """CREATE TABLE IF NOT EXISTS 
-players(player_number INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, division INTEGER, coach TEXT)""" # NOTE: Mispelled division when initzializing
+players(player_number INTEGER PRIMARY KEY, first_name TEXT, last_name TEXT, division INTEGER, coach TEXT)"""
 cursor.execute(c1)
 
+# check if the players table is empty
+def is_players_table_empty():
+    cursor.execute("SELECT COUNT(*) FROM players")
+    return cursor.fetchone()[0] == 0
+# import data from Excel to the database
+def import_from_excel(file_path):
+    try:
+        # read excel file
+        df = pd.read_excel(file_path, engine='openpyxl')
+        df.rename(
+            columns={
+                "Player Number": "player_number",
+                "First Name": "first_name",
+                "Last Name": "last_name",
+                "Division": "division",
+                "Coach": "coach"
+            },
+            inplace=True
+        )
+
+        # insert data into players table
+        for _, row in df.iterrows():
+            cursor.execute(
+                "INSERT OR IGNORE INTO players (player_number, first_name, last_name, division, coach) VALUES (?, ?, ?, ?, ?)",
+                (row["player_number"], row["first_name"], row["last_name"], row["division"], row["coach"]),
+            )
+        conn.commit()
+    except Exception as e:
+        raise ValueError(f"Failed to import data from Excel: {e}")
 # insert player function
 def insert_player(num, fn, ln, div, coach):
     cursor.execute("INSERT INTO players (player_number, first_name, last_name, division, coach) VALUES (?, ?, ?, ?, ?)",
                    (num, fn, ln, div, coach))
     conn.commit() 
 # query all players
-def query_all_players(sort_filter):
+def query_all_players(sort_filter=None):
     if sort_filter == "Name [Z-A]":
         cursor.execute("SELECT * FROM players ORDER BY first_name DESC")
     elif sort_filter == "Number":
          cursor.execute("SELECT * FROM players ORDER BY player_number")
     elif sort_filter == "Division":
-        cursor.execute("SELECT * FROM players ORDER BY divsion DESC") # NOTE: SPELLING ERROR IN for division col
+        cursor.execute("SELECT * FROM players ORDER BY division DESC") 
         # NOTE: make data field strictly integer type
     elif sort_filter == "Coach":
         cursor.execute("SELECT * FROM players ORDER BY coach")
@@ -53,12 +83,31 @@ def delete_player(to_delete):
         cursor.execute(query, [item for sublist in name_tuples for item in sublist])
         conn.commit()
 
-# # generat xlsx
-# def export_to_excel():
-#     query = "SELECT * FROM players"
-#     df = pd.read_sql_query(query, conn)  # Fetch data as a DataFrame
-#     output_file = "players_data.xlsx"
-#     df.to_excel(output_file, index=False, engine='openpyxl')  # Save DataFrame to Excel
+# generat xlsx
+def export_to_excel():
+    try:
+        # prompt user to select location and file name for saving
+        file_path = filedialog.asksaveasfilename(
+            defaultextension=".xlsx",
+            filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")],
+            title="Save Excel File As"
+        )
+
+        # if user cancels, do nothing
+        if not file_path:
+            return
+
+        # query database
+        query = "SELECT * FROM players"
+        df = pd.read_sql_query(query, conn)  # fetch data as dataframe
+
+        # save dataframe to specified file
+        df.to_excel(file_path, index=False, engine='openpyxl')
+
+        print(f"Data successfully exported to {file_path}")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
      
 

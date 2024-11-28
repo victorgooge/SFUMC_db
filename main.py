@@ -1,6 +1,8 @@
 import customtkinter as ctk
 from tkinter import ttk
 import rec_db  
+from tkinter import filedialog
+
 
 
 
@@ -10,13 +12,37 @@ ctk.set_default_color_theme("blue")
 # create main root window
 root = ctk.CTk()
 root.title("Modern CTk Table")
-root.geometry("700x400")
+root.geometry("1000x400")
 
 
 
 # main Frame (contains all subframes)
 main_frame = ctk.CTkFrame(root, fg_color="#2e2e2e")
 main_frame.pack(fill="both", expand=True, padx=20, pady=20)
+
+
+
+# Import XLSX data button
+def import_xlsx():
+        # Open file dialog to select Excel file
+        file_path = filedialog.askopenfilename(
+            filetypes=[("Excel files", "*.xlsx"), ("All files", "*.*")]
+        )
+        if not file_path:
+            return  # User canceled
+
+        # Import the data into the database
+        rec_db.import_from_excel(file_path)
+
+        # Refresh the table
+        display()
+noData_label = ctk.CTkLabel(main_frame, text="NO DATA", font=("Consolas", 28))
+noData_label.pack(expand=True, pady=50, anchor="center")
+import_btn = ctk.CTkButton(main_frame, text="Import Data", command=import_xlsx)
+import_btn.pack(expand=True, pady=20, anchor="center")
+
+
+
 # table Frame (for TreeView)
 table_frame = ctk.CTkFrame(main_frame, fg_color="#2e2e2e")
 table_frame.pack(fill="both", expand=True, pady=(10, 0))
@@ -206,6 +232,10 @@ sort_menu = ctk.CTkOptionMenu(
 sort_menu.set("Sort By")  
 sort_menu.pack(side="left", padx=10)
 
+# generate xlsx
+gen_xlsx_btn = ctk.CTkButton(button_frame, text="Export Data", command=rec_db.export_to_excel)
+gen_xlsx_btn.pack(side="left", padx=10)
+
 # widget functionality
 # search bar
 def search(event=None):
@@ -220,11 +250,17 @@ search_entry.pack(side="left", fill="x", expand=True, padx=10)
 search_entry.bind("<KeyRelease>", search)
 
 
-
 # display data from db into tree table
 def display(cmd=None, sort=None, dset=None):
     for item in tree.get_children():
         tree.delete(item)
+
+    if rec_db.is_players_table_empty():
+        tree.pack_forget()  # hide the empty packed table
+        return
+    noData_label.pack_forget()
+    import_btn.pack_forget()
+    tree.pack(fill="both", expand=True)
 
     if cmd == "select-players" and dset: # player search
         data = rec_db.query_player(dset)
@@ -232,10 +268,9 @@ def display(cmd=None, sort=None, dset=None):
         data = rec_db.query_all_players(sort)
     else:
         data = rec_db.query_all_players("Name [A-Z]") # default alphabetical sort
-        
+
     for row in data:
         tree.insert("", "end", values=row)
-
 
 
 # exe
