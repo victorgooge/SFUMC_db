@@ -1,2 +1,2 @@
 ## Database and GUI program
-- SFUMC Recreation Example Database
+This project features a database represented through a user interface. The database simulates data from a soccer league (SFUMC - Stockbridge, GA), including player, coach, and team data. The UI is built using Python's customtkinter library, which allows for the creation of cohesive graphical user interface applications for desktop platforms. The GUI enables user interaction, allowing the addition, deletion, and searching of players efficiently, even in large quantities. Additionally, the interface formats the data neatly, making it easy for users to quickly look up information. Several sorting options are available to organize the data as needed.
